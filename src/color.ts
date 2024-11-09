@@ -46,7 +46,7 @@ export const getGradient = (colorPalette: string) => {
       return getChromaScaleFromCSV("#264653, #2a9d8f, #e9c46a, #f4a261, #e76f51");
     case "fire":
       return getChromaScaleFromCSV(
-        "#03071e, #370617, #6a040f, #9d0208, #d00000, #dc2f02, #e85d04, #f48c06, #faa307, #ffba08"
+        "#03071e, #370617, #6a040f, #9d0208, #d00000, #dc2f02, #e85d04, #f48c06, #faa307, #ffba08, #ffffff"
       );
     case "ice":
       return getChromaScaleFromCSV("#03045e, #023e8a, #0077b6, #0096c7, #00b4d8, #48cae4, #90e0ef, #ade8f4, #caf0f8");

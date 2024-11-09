@@ -8,7 +8,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgb(2,0,36);
-  background: linear-gradient(140deg, rgba(2,0,36,1) 0%, rgba(26,26,55,1) 47%, rgba(34,15,37,1) 100%);
+  background: rgb(0,0,0);
   font-family: "Poppins", sans-serif;
 }

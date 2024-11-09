@@ -9,8 +9,9 @@ const main = () => {
     numberOfParticles: 100000,
     sphereRadius: 50,
     backgroundColor: 0x000,
+    noiseResolution: 0.05,
     particleSize: 0.01,
-    gradient: getGradient("spectral"),
+    gradient: getGradient("fire"),
   });
   const fade = new Fade({ alpha: 0.05 });
 
@@ -24,7 +25,7 @@ const main = () => {
   function animate() {
     requestAnimationFrame(animate);
 
-    simulation.update({ deltaTime: 1, step });
+    simulation.update({ deltaTime: 0.5, step });
     renderer.render();
 
     step += 1;

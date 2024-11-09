@@ -18,13 +18,11 @@ const createOrbitControls = (camera: THREE.Camera, renderer: THREE.Renderer) => 
  */
 export class Renderer {
   private readonly renderer: THREE.WebGLRenderer;
-  private readonly gl: WebGLRenderingContext;
   private renderables: Renderable[] = [];
   private controls?: OrbitControls;
 
   constructor() {
     this.renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
-    this.gl = this.renderer.getContext();
   }
 
   init() {
@@ -34,11 +32,12 @@ export class Renderer {
     document.body.appendChild(this.renderer.domElement);
   }
 
-  add(renderable: Renderable, { addControls = true } = {}) {
+  add(renderable: Renderable, { addControls = false } = {}) {
     this.renderables.push(renderable);
 
     if (addControls) {
       this.controls = createOrbitControls(renderable.camera, this.renderer);
+      this.controls.target = new THREE.Vector3(0, 0, -40);
       this.controls.update();
     }
 
@@ -46,9 +45,6 @@ export class Renderer {
   }
 
   render() {
-    this.gl.enable(this.gl.BLEND);
-    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
-
     this.controls?.update();
 
     for (const renderable of this.renderables) {

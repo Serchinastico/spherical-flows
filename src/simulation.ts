@@ -20,7 +20,7 @@ interface Particle {
   velocity: Vector3D;
 }
 
-const FRICTION = 0.01;
+const FRICTION = 0.02;
 const NOISE_STRENGTH = 0.01;
 
 const createParticle = () => {
@@ -41,6 +41,7 @@ const createParticle = () => {
 
 interface SimulationConstructorProps extends GlParticlesConstructorProps {
   numberOfParticles: number;
+  noiseResolution: number;
 }
 
 /**
@@ -54,7 +55,7 @@ export class Simulation {
   particles: Particle[] = [];
 
   constructor(props: SimulationConstructorProps) {
-    this.vectorField = getNoiseFn({ resolution: 0.1 });
+    this.vectorField = getNoiseFn({ resolution: props.noiseResolution });
     this.sphereRadius = props.sphereRadius;
     this.particles = new Array(props.numberOfParticles).fill(0).map(createParticle);
     this.glParticles = new GlParticles(props);
@@ -82,11 +83,32 @@ export class Simulation {
     return { theta: Math.atan2(cart.y, cart.x), phi: Math.acos(cart.z / r) };
   }
 
+  getNoise({ position, step }: { position: Vector3D; step: number }) {
+    const loopFrequency = 60; // roughly the same as the music
+
+    if (step % loopFrequency === loopFrequency - 1) {
+      let x: number;
+      let y: number;
+      if (Math.floor(step / loopFrequency) % 2 === 0) {
+        x = Math.random() * 100;
+        y = Math.random() * 100;
+      } else {
+        x = Math.random() * 20 + 50;
+        y = Math.random() * 20 + 50;
+      }
+
+      const threshold = position.x + 3 * Math.cos(position.y / 2);
+      return threshold < -5 ? { x, y } : { x: -x, y: -y };
+    }
+
+    return this.vectorField(position.x, position.y, position.z);
+  }
+
   update({ deltaTime, step }: { deltaTime: number; step: number }) {
     this.particles.forEach((particle) => {
       const cartesianPosition = this.fromPolarToCartesian(particle.position);
 
-      const noise = this.vectorField(cartesianPosition.x, cartesianPosition.y, cartesianPosition.z);
+      const noise = this.getNoise({ position: cartesianPosition, step });
 
       particle.velocity.x += NOISE_STRENGTH * noise.x * deltaTime;
       particle.velocity.y += NOISE_STRENGTH * noise.y * deltaTime;
@@ -133,7 +155,7 @@ export class Simulation {
         particle.velocity.x ** 2 + particle.velocity.y ** 2 + particle.velocity.z ** 2
       );
 
-      if (velocityMagnitude < 0.01) {
+      if (velocityMagnitude < 0.001) {
         const newParticle = createParticle();
         particle.position = newParticle.position;
         particle.velocity = newParticle.velocity;
