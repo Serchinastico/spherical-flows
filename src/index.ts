@@ -9,7 +9,8 @@ const main = () => {
     numberOfParticles: 100000,
     sphereRadius: 50,
     backgroundColor: 0x000,
-    noiseResolution: 0.05,
+    noiseSpatialResolution: 0.05,
+    noiseTemporalResolution: 0.01,
     particleSize: 0.01,
     gradient: getGradient("fire"),
   });
