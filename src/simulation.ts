@@ -7,7 +7,10 @@ import { Particle, Vector3D } from "./types";
 import { fromPolarToCartesian } from "./coords";
 
 const FRICTION = 0.02;
+const SPRING_STRENGTH = 0.0001;
 const NOISE_STRENGTH = 0.01;
+const STARTING_VELOCITY_STRENGTH = 0.0;
+const GRADIENT_COLOR_MULTIPLIER = 2.5;
 
 const createParticle = (radius: number): Particle => {
   // Generate random position on sphere using uniform sampling
@@ -17,9 +20,9 @@ const createParticle = (radius: number): Particle => {
   const position = fromPolarToCartesian({ theta, phi }, radius);
 
   // Generate random velocity in tangent plane
-  const velocityX = Math.random() * 0.01 - 0.005;
-  const velocityY = Math.random() * 0.001 - 0.0005;
-  const velocityZ = Math.random() * 0.001 - 0.0005;
+  const velocityX = STARTING_VELOCITY_STRENGTH * (Math.random() * 0.001 - 0.0005);
+  const velocityY = STARTING_VELOCITY_STRENGTH * (Math.random() * 0.001 - 0.0005);
+  const velocityZ = STARTING_VELOCITY_STRENGTH * (Math.random() * 0.001 - 0.0005);
 
   return {
     startingPosition: position,
@@ -77,8 +80,18 @@ export class Simulation {
 
       const noise = this.getNoise({ position: particle.position, step });
 
-      particle.velocity.x += NOISE_STRENGTH * noise.x * deltaTime;
-      particle.velocity.y += NOISE_STRENGTH * noise.y * deltaTime;
+      const springVelocity: Vector3D = {
+        x: particle.startingPosition.x - particle.position.x,
+        y: particle.startingPosition.y - particle.position.y,
+        z: particle.startingPosition.z - particle.position.z,
+      };
+
+      particle.velocity.x += SPRING_STRENGTH * springVelocity.x;
+      particle.velocity.y += SPRING_STRENGTH * springVelocity.y;
+      particle.velocity.z += SPRING_STRENGTH * springVelocity.z;
+      // particle.velocity.x += SPRING_STRENGTH * springVelocity.x /* * NOISE_STRENGTH * noise.x */ * deltaTime;
+      // particle.velocity.y += SPRING_STRENGTH * springVelocity.y /* * NOISE_STRENGTH * noise.y */ * deltaTime;
+      // particle.velocity.z += SPRING_STRENGTH * springVelocity.z * deltaTime;
 
       particle.position.x += particle.velocity.x * deltaTime;
       particle.position.y += particle.velocity.y * deltaTime;
@@ -89,15 +102,15 @@ export class Simulation {
       );
 
       // Normalize to move it back to the Earth's surface
-      particle.position.x *= this.sphereRadius / newRadialDistance;
-      particle.position.y *= this.sphereRadius / newRadialDistance;
-      particle.position.z *= this.sphereRadius / newRadialDistance;
+      // particle.position.x *= this.sphereRadius / newRadialDistance;
+      // particle.position.y *= this.sphereRadius / newRadialDistance;
+      // particle.position.z *= this.sphereRadius / newRadialDistance;
 
       // Now also update the velocity vector to reflect it being on the sphere
       const surfaceNormal = {
-        x: cartesianPosition.x / this.sphereRadius,
-        y: cartesianPosition.y / this.sphereRadius,
-        z: cartesianPosition.z / this.sphereRadius,
+        x: particle.position.x / this.sphereRadius,
+        y: particle.position.y / this.sphereRadius,
+        z: particle.position.z / this.sphereRadius,
       };
       const dotProduct =
         particle.velocity.x * surfaceNormal.x +
@@ -105,11 +118,11 @@ export class Simulation {
         particle.velocity.z * surfaceNormal.z;
 
       // Subtract the normal component from the current velocity to keep it tangent to the sphere
-      particle.velocity = {
-        x: particle.velocity.x - dotProduct * surfaceNormal.x,
-        y: particle.velocity.y - dotProduct * surfaceNormal.y,
-        z: particle.velocity.z - dotProduct * surfaceNormal.z,
-      };
+      // particle.velocity = {
+      //   x: particle.velocity.x - dotProduct * surfaceNormal.x,
+      //   y: particle.velocity.y - dotProduct * surfaceNormal.y,
+      //   z: particle.velocity.z - dotProduct * surfaceNormal.z,
+      // };
 
       particle.velocity.x *= 1 - FRICTION;
       particle.velocity.y *= 1 - FRICTION;
@@ -121,7 +134,7 @@ export class Simulation {
           particle.velocity.z * particle.velocity.z
       );
 
-      particle.color = this.gradient(velocityMagnitude / 0.4);
+      particle.color = this.gradient(velocityMagnitude * GRADIENT_COLOR_MULTIPLIER);
 
       if (velocityMagnitude < 0.001) {
         const newParticle = createParticle(this.sphereRadius);

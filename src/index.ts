@@ -26,7 +26,7 @@ const main = () => {
   function animate() {
     requestAnimationFrame(animate);
 
-    simulation.update({ deltaTime: 1.0, step });
+    simulation.update({ deltaTime: 0.5, step });
     renderer.render();
 
     step += 1;
