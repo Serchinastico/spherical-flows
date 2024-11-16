@@ -10,7 +10,7 @@ const main = () => {
     sphereRadius: 50,
     backgroundColor: 0x000,
     noiseSpatialResolution: 0.05,
-    noiseTemporalResolution: 0.01,
+    noiseTemporalResolution: 0.001,
     particleSize: 0.01,
     gradient: getGradient("fire"),
   });
@@ -26,7 +26,7 @@ const main = () => {
   function animate() {
     requestAnimationFrame(animate);
 
-    simulation.update({ deltaTime: 0.5, step });
+    simulation.update({ deltaTime: 1.0, step });
     renderer.render();
 
     step += 1;

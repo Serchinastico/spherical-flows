@@ -6,9 +6,9 @@ const createCamera = () => {
   const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 10000);
   camera.up = new THREE.Vector3(0, 0, 1);
   camera.lookAt(new THREE.Vector3(0, 0, 0));
-  camera.translateX(50);
-  camera.translateY(50);
-  camera.translateZ(50);
+  camera.translateX(100);
+  camera.translateY(100);
+  camera.translateZ(100);
 
   return camera;
 };

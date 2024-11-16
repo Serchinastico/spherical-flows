@@ -37,7 +37,7 @@ export class Renderer {
 
     if (addControls) {
       this.controls = createOrbitControls(renderable.camera, this.renderer);
-      this.controls.target = new THREE.Vector3(0, 0, -40);
+      this.controls.target = new THREE.Vector3(0, 0, 0);
       this.controls.update();
     }
 
